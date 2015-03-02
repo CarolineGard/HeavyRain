@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>three.js webgl - geometry - terrain</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body {
+                color: #61443e;
+                font-family:Monospace;
+                font-size:13px;
+                text-align:center;
+
+                background-color: #bfd1e5;
+                margin: 0px;
+                overflow: hidden;
+            }
+
+            #info {
+                position: absolute;
+                top: 0px; width: 100%;
+                padding: 5px;
+            }
+
+            a {
+
+                color: #a06851;
+            }
+
+        </style>
+
+        ////////////////////--SHADERS--/////////////////////////////////
+        //VERTEX-SHADER
+         //<script id="shader-vs" type="x-shader/x-vertex">
+         //attribute vec3 aVertexPosition;
+
+         //void main() {
+         // gl_Postition = projectMatrix * modelViewMatrix * vec4(position, 1.0);   
+         //}
+         
+
+         //</script>
+
+         //FRAGMENT-SHADER
+         //<script id="shader-vs" type="x-shader/x-fragment">
+            //void main() {
+                gl_FragColor = vec4( 1.0, 0.0, 0.0 1.0 );
+         // }
+        // </script>
+
+        ////////////////////////////////////////////////////////////////
+
+    </head>
+    <body>
+
+        <div id="container"><br /><br /><br /><br /><br />Generating world...</div>
+        <div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl terrain demo<br />(left click: forward, right click: backward)</div>
+
+
+        <script src="three.min.js"></script>
+        <script src="js/libs/stats.min.js"></script>
+
+        <script>
+
+
+            var container, stats;
+            var camera, controls, scene, renderer;
+            var particles, geomparticle, pmaterial;
+            var mesh, texture;
+
+            var clock = new THREE.Clock();
+
+
+            init();
+            animate();
+
+            function init() {
+
+                container = document.getElementById( 'container' );
+                scene = new THREE.Scene();
+
+                camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+
+                camera.position.set(60,60,100);
+                camera.lookAt( scene.position );
+                
+                pmaterial = new THREE.PointCloudMaterial({
+                    color: 0xFFFFFF,
+                    size: 2,
+                    map: THREE.ImageUtils.loadTexture(
+                        "images/sprite.png"
+                    ),
+                    //blending: THREE.AdditiveBlending,
+                    transparent: true
+                });
+
+                //create the raindrops
+                geomparticle = new THREE.Geometry();
+
+                //Create where they will be
+                for ( i = 0; i < 50; i ++ ) {
+
+                    var vertex = new THREE.Vector3();
+                    vertex.x = Math.random() * 100 - 50;
+                    vertex.y = Math.random() * 100 - 50;
+                    vertex.z = Math.random() * 100 - 50;
+
+                    geomparticle.vertices.push( vertex );
+
+                }
+
+                //add to scene and so on
+                particles = new THREE.PointCloud( geomparticle, pmaterial);
+                //particles.velocity = new THREE.Vector3(0, -8, 0);
+                scene.add(particles);
+
+                var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+
+                var geometry = new THREE.PlaneGeometry( 100, 100, 40, 40 );
+                
+                var meshen = new THREE.Mesh( geometry, material );
+                
+                //meshen.doublesided = true;
+                meshen.rotation.x = Math.PI/2;
+                scene.add(meshen);
+                //scene.add( meshen );
+
+                //ekvationen z = Math.pow(Math.e, (2*(x^2 + y ^2));
+
+
+                var ix = 0; //rad
+                var iy = 0; //kolumn
+
+                console.log("hej: " + geometry.vertices.length);
+
+                //startvärden
+                geometry.vertices[150].z = -10;
+                geometry.vertices[151].z =  -10;
+                geometry.vertices[152].z = -15;
+                geometry.vertices[190].z = - 15;
+                geometry.vertices[192].z = -15;
+                geometry.vertices[191].z = - 15;
+                geometry.vertices[230].z = -15;
+                geometry.vertices[231].z = - 15;
+                geometry.vertices[232].z = - 15;
+
+                var dx = 1, dy = 1, dt = 1/60, g = 9.81;
+                var amount_X = 40, amount_Y = 40;
+
+                //LAX WENDROFF stegmetod
+
+                //första steget
+
+
+                //Andra steget
+
+
+                ////////////////////////////////////////////////////////////////////
+
+
+                renderer = new THREE.WebGLRenderer();
+                renderer.setClearColor( 0xbfd1e5 );
+                renderer.setPixelRatio( window.devicePixelRatio );
+                renderer.setSize( window.innerWidth, window.innerHeight );
+
+                container.innerHTML = "";
+
+                container.appendChild( renderer.domElement );
+
+                stats = new Stats();
+                stats.domElement.style.position = 'absolute';
+                stats.domElement.style.top = '0px';
+                container.appendChild( stats.domElement );
+
+                //
+
+                window.addEventListener( 'resize', onWindowResize, false );
+
+            }
+
+
+            function onWindowResize() {
+
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+
+                renderer.setSize( window.innerWidth, window.innerHeight );
+
+                controls.handleResize();
+
+            }
+
+
+
+            function animate() {
+
+                requestAnimationFrame( animate );
+
+                render();
+                stats.update();
+
+            }
+
+            function render() {
+                //console.log("particles: " + dt);
+                for(var p = 0; p < particles.geometry.vertices.length; p++){
+                    particles.geometry.vertices[p].y -= 1.3;
+                    if(particles.geometry.vertices[p].y < 0){
+                        particles.geometry.vertices[p].y = Math.random()*70;
+                    }
+                    //console.log("particles: " + particles.geometry.vertices[5].y);
+                    //particles.attributes.position.y += 5.0;
+                }
+                particles.geometry.verticesNeedUpdate = true;
+                //controls.update( clock.getDelta() );
+                renderer.render( scene, camera );
+
+            }
+
+        </script>
+
+    </body>
+</html>
