@@ -216,19 +216,19 @@
                 for(var i = 0; i < row; i++)
                 {
                     geometry.vertices[i*row].z = geometry.vertices[(i*row) + 1].z;
-                    geometry.vertices[(i*row) + 39].z = geometry.vertices[(i*row) + 38].z;    
+                    geometry.vertices[(i*row) + 40].z = geometry.vertices[(i*row) + 39].z;    
                     geometry.vertices[i].z = geometry.vertices[i + row].z;
-                    geometry.vertices[39*row + i].z = geometry.vertices[38*row + i].z;   
+                    geometry.vertices[40*row + i].z = geometry.vertices[39*row + i].z;   
                     
                     U[i*row].z = U[(i*row) + 1].z;
-                    U[(i*row) + 39].z = U[(i*row) + 38].z;    
+                    U[(i*row) + 40].z = U[(i*row) + 39].z;    
                     U[i].z = - U[i + row].z;
-                    U[39*row + i].z = - U[38*row + i].z;  
+                    U[40*row + i].z = - U[39*row + i].z;  
                     
                     V[i*row].z = - V[(i*row) + 1].z;
-                    V[(i*row) + 39].z = - V[(i*row) + 38].z;    
+                    V[(i*row) + 40].z = - V[(i*row) + 39].z;    
                     V[i].z = V[i + row].z;
-                    V[39*row + i].z = V[38*row + i].z;                   
+                    V[40*row + i].z = V[39*row + i].z;                   
                 }                
 
 
