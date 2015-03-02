@@ -67,7 +67,7 @@
 
         <script>
 
-
+            var geometry, meshen;
             var container, stats;
             var camera, controls, scene, renderer;
             var mesh, texture;
@@ -90,9 +90,9 @@
 
 
                 var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
-                var geometry = new THREE.PlaneGeometry( 100, 100, 40, 40 );
+                geometry = new THREE.PlaneGeometry( 100, 100, 40, 40 );
                 
-                var meshen = new THREE.Mesh( geometry, material );
+                meshen = new THREE.Mesh( geometry, material );
                 
                 //meshen.doublesided = true;
                 meshen.rotation.x = - Math.PI/2;
@@ -204,35 +204,39 @@
                 var dx = 1, dy = 1, dt = 1/60, g = 9.81;    
                 var row = 40;
 
-                for ( var i = 0; i < ( (row - 1) * (row - 2)); i++ )
-                {
-                    Hx[i] = ( H[i + 41] + H[i + 40]) / 2 - (dt / (2 * dx)) * ( U[i + 41] - U[i + 40]);
-                    Ux[i] = (( 0.5 * (U[i + 41] + U[i + 40] ) - (dt / (2 * dx))* ( Math.pow(U[i + 41], 2) + (( 0.5 * g * H[i + 41] - ( Math.pow( U[i + 40], 2) + 0.5 * g * H[i + 40] ))))));
-                    Vx[i] = 0.5 * (V[i + 40] + V[i + 41]) - (dt / (2 * dx)) * (U[i + 41] * V[i + 41] - U[i + 40] * V[i + 40] );
+                geometry.vertices[150].z += 1; 
 
-                }
+                // for ( var i = 0; i < ( (row - 1) * (row - 2)); i++ )
+                // {
+                //     Hx[i] = ( H[i + 41] + H[i + 40]) / 2 - (dt / (2 * dx)) * ( U[i + 41] - U[i + 40]);
+                //     Ux[i] = (( 0.5 * (U[i + 41] + U[i + 40] ) - (dt / (2 * dx))* ( Math.pow(U[i + 41], 2) + (( 0.5 * g * H[i + 41] - ( Math.pow( U[i + 40], 2) + 0.5 * g * H[i + 40] ))))));
+                //     Vx[i] = 0.5 * (V[i + 40] + V[i + 41]) - (dt / (2 * dx)) * (U[i + 41] * V[i + 41] - U[i + 40] * V[i + 40] );
 
-                for( var i = 0; i < ((row - 2)*(row - 1 )); i++)
-                {
-                    Hy[i] = 0.5 * ( H[i + 41] + H[i + 1] ) - (dt/(2*dy))*(V[i+41]-V[i+1]);
-                    Uy[i] = 0.5 * ( U[i + 1 ] + U[i + 41] ) - (dt / (2 * dy)) * ( V[i + 41] * U[i + 41] - V[i + 1] * U[i + 1] );
-                    Vy[i] = 0.5 * ( V[i + 41] + V[i + 1] ) - (dt / (2 * dy)) * ( Math.pow(V[i + 41], 2) + 0.5 * g * H[i + 41] - ( Math.pow(V[i + 1], 2) + 0.5 * g * H[i + 1] ));
-                }
+                // }
 
-                //Andra steget:
+                // for( var i = 0; i < ((row - 2)*(row - 1 )); i++)
+                // {
+                //     Hy[i] = 0.5 * ( H[i + 41] + H[i + 1] ) - (dt/(2*dy))*(V[i+41]-V[i+1]);
+                //     Uy[i] = 0.5 * ( U[i + 1 ] + U[i + 41] ) - (dt / (2 * dy)) * ( V[i + 41] * U[i + 41] - V[i + 1] * U[i + 1] );
+                //     Vy[i] = 0.5 * ( V[i + 41] + V[i + 1] ) - (dt / (2 * dy)) * ( Math.pow(V[i + 41], 2) + 0.5 * g * H[i + 41] - ( Math.pow(V[i + 1], 2) + 0.5 * g * H[i + 1] ));
+                // }
 
-                for( var i = 41; i < ((row - 2)*(row - 1 )); i++)
-                {
-                    H[i] = H[i] - (dt/dx) * ( Ux[i - 40] - Ux[i - 41]) - (dt/dy) * (Vy[i - 1] - Vy[i - 41]);
-                    U[i] = U[i] - (dt/dx) * (Math.pow(Ux[i - 41], 2) + (0.5 * g * Hx[i - 40] - (Math.pow(Ux[i - 41], 2) + 0.5 * g * Hx[i - 41] ))) - (dt / dy)* (Vy[i - 1] * Uy[i - 1] - Vy[i - 41] * Uy[i - 41] );
-                    V[i] = V[i] - (dt/dx) * (Ux[i - 40] * Vx[i - 40] - Ux[i - 41] * Vx[i - 41] ) - (dt / dy) * ((Math.pow(Vy[i - 1], 2) + 0.5 * g * Hy[i - 1] ) - (Math.pow(Vy[i - 41], 2) + 0.5 * g * Hy[i - 41] ));
-                }
+                // //Andra steget:
+
+                // for( var i = 41; i < ((row - 2)*(row - 1 )); i++)
+                // {
+                //     H[i] = H[i] - (dt/dx) * ( Ux[i - 40] - Ux[i - 41]) - (dt/dy) * (Vy[i - 1] - Vy[i - 41]);
+                //     U[i] = U[i] - (dt/dx) * (Math.pow(Ux[i - 41], 2) + (0.5 * g * Hx[i - 40] - (Math.pow(Ux[i - 41], 2) + 0.5 * g * Hx[i - 41] ))) - (dt / dy)* (Vy[i - 1] * Uy[i - 1] - Vy[i - 41] * Uy[i - 41] );
+                //     V[i] = V[i] - (dt/dx) * (Ux[i - 40] * Vx[i - 40] - Ux[i - 41] * Vx[i - 41] ) - (dt / dy) * ((Math.pow(Vy[i - 1], 2) + 0.5 * g * Hy[i - 1] ) - (Math.pow(Vy[i - 41], 2) + 0.5 * g * Hy[i - 41] ));
+                // }
 
                 for ( var i = 0; i < (row + 1) * (row + 1); i++)
                 {
-                    geometry.vertices[i].z = H[i];
+                    //geometry.vertices[i].z = H[i];
 
                 }
+
+                meshen.geometry.verticesNeedUpdate = true;
 
                 //controls.update( clock.getDelta() );
                 renderer.render( scene, camera );
