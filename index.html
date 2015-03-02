@@ -1,72 +1,144 @@
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Rainy day</title>
+        <title>three.js webgl - geometry - terrain</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <style>
             body {
-                background-color: #000000;
+                color: #61443e;
+                font-family:Monospace;
+                font-size:13px;
+                text-align:center;
+
+                background-color: #bfd1e5;
                 margin: 0px;
                 overflow: hidden;
             }
 
-            a {
-                color:#0078ff;
+            #info {
+                position: absolute;
+                top: 0px; width: 100%;
+                padding: 5px;
             }
+
+            a {
+
+                color: #a06851;
+            }
+
         </style>
+
+        ////////////////////--SHADERS--/////////////////////////////////
+        //VERTEX-SHADER
+         //<script id="shader-vs" type="x-shader/x-vertex">
+         //attribute vec3 aVertexPosition;
+
+         //void main() {
+         // gl_Postition = projectMatrix * modelViewMatrix * vec4(position, 1.0);   
+         //}
+         
+
+         //</script>
+
+         //FRAGMENT-SHADER
+         //<script id="shader-vs" type="x-shader/x-fragment">
+            //void main() {
+                gl_FragColor = vec4( 1.0, 0.0, 0.0 1.0 );
+         // }
+        // </script>
+
+        ////////////////////////////////////////////////////////////////
+
     </head>
     <body>
-        <script src="three.min.js"></script>
 
-        <script src="Projector.js"></script>
-        <script src="CanvasRenderer.js"></script>
-        <script src="webgl-utils.js"></script>
-        <script src="glMatrix.min.js"></script>
+        <div id="container"><br /><br /><br /><br /><br />Generating world...</div>
+        <div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl terrain demo<br />(left click: forward, right click: backward)</div>
+
+        <script src="../build/three.min.js"></script>
+
+        <script src="js/controls/FirstPersonControls.js"></script>
+        <script src="three.min.js"></script>
+        <script src="js/ImprovedNoise.js"></script>
+        <script src="js/Detector.js"></script>
+        <script src="js/libs/stats.min.js"></script>
         <script src="stats.min.js"></script>
 
-        <script id="dropVertexShader" type="x-shader/x-vertex">
-            //Vertex shader
-            void main() 
-            {
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
-            }
-        </script>
-
-        <script id="dropFragmentShader" type="x-shader/x-fragment">
-            //Fragment shader
-            void main() 
-            {
-                gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0); 
-            }
-        </script>
-        
         <script>
 
-            var SEPARATION = 5, AMOUNTX = 20, AMOUNTY = 20;
 
             var container, stats;
-            var camera, scene, renderer, sphere;
+            var camera, controls, scene, renderer;
+            var mesh, texture;
 
-            var particles, particle, velocity, count = 0, g = 9.8, dt = 1/60, dx = 1, dy = 1;
+            var clock = new THREE.Clock();
 
 
             init();
             animate();
 
-            function init() 
-            {
-                //initialization, camera, renderer, scene...
-                container = document.createElement( 'div' );
-                document.body.appendChild( container );
+            function init() {
 
+                container = document.getElementById( 'container' );
                 scene = new THREE.Scene();
-                camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+
+                camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+
+                camera.position.set(60,60,100);
+                camera.lookAt( scene.position );
+
+
+                var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+                var geometry = new THREE.PlaneGeometry( 100, 100, 40, 40 );
+                
+                var meshen = new THREE.Mesh( geometry, material );
+                
+                //meshen.doublesided = true;
+                meshen.rotation.x = Math.PI/2;
+                scene.add(meshen);
+                //scene.add( meshen );
+
+                //ekvationen z = Math.pow(Math.e, (2*(x^2 + y ^2));
+
+
+                var ix = 0; //rad
+                var iy = 0; //kolumn
+
+                console.log("hej: " + geometry.vertices.length);
+
+                //startvärden
+                geometry.vertices[150].z = -10;
+                geometry.vertices[151].z =  -10;
+                geometry.vertices[152].z = -15;
+                geometry.vertices[190].z = - 15;
+                geometry.vertices[192].z = -15;
+                geometry.vertices[191].z = - 15;
+                geometry.vertices[230].z = -15;
+                geometry.vertices[231].z = - 15;
+                geometry.vertices[232].z = - 15;
+
+                var dx = 1, dy = 1, dt = 1/60, g = 9.81;
+                var amount_X = 40, amount_Y = 40;
+
+                //LAX WENDROFF stegmetod
+
+                //första steget
+
+
+                //Andra steget
+
+
+                ////////////////////////////////////////////////////////////////////
+
 
                 renderer = new THREE.WebGLRenderer();
+                renderer.setClearColor( 0xbfd1e5 );
+                renderer.setPixelRatio( window.devicePixelRatio );
                 renderer.setSize( window.innerWidth, window.innerHeight );
-                document.body.appendChild( renderer.domElement );
+
+                container.innerHTML = "";
+
                 container.appendChild( renderer.domElement );
 
                 stats = new Stats();
@@ -74,156 +146,43 @@
                 stats.domElement.style.top = '0px';
                 container.appendChild( stats.domElement );
 
-                //Set camera position
-                camera.position.set(10,60,100);
-                camera.lookAt( scene.position );
+                //
 
-                uniforms = {
-                        time: { type: "f", value: 1.0 },
-                        resolution: { type: "v2", value: new THREE.Vector2() }
-                    };
-
-                var dropMaterial = new THREE.ShaderMaterial( {
-
-                        uniforms: uniforms,
-                        vertexShader: document.getElementById( 'dropVertexShader' ).textContent,
-                        fragmentShader: document.getElementById( 'dropFragmentShader' ).textContent
-
-                    } );
-                //Initialize sphere (radius, widthSegments, hightSegment...)
-                sphere = new THREE.Mesh(new THREE.SphereGeometry(5, 100, 100), dropMaterial);
-                    //new THREE.MeshBasicMaterial( { color: 0x00ff00 } ));
-
-                
-                sphere.position.set(0,60,0); 
-
-                scene.add(sphere);
-
-
-
-
-                //chreate particles, water
-                particles = new Array();
-                velocity = new Array();
-               
-
-                var PI2 = Math.PI * 2;
-                var material = new THREE.SpriteMaterial( {
-
-                    transparent: true,
-
-                    color: 0xffffff
-
-                } );
-
-                var i = 0, j = 0;
-
-                for ( var ix = 0; ix < AMOUNTX; ix ++ ) 
-                {
-                    for ( var iy = 0; iy < AMOUNTY; iy ++ ) 
-                    {
-
-                        particle = particles[ i ++ ] = new THREE.Sprite( material );
-                        particle.position.x = ix * SEPARATION - ( ( AMOUNTX * SEPARATION ) / 2 );
-                        particle.position.z = iy * SEPARATION - ( ( AMOUNTY * SEPARATION ) / 2 );
-
-
-                        particle.Hx = 0;
-                        particle.Hy = 0;
-                        particle.Ux = 0;
-                        particle.Uy = 0;
-                        particle.Vx = 0;
-                        particle.Vy = 0;
-
-                            
-
-
-
-                        scene.add( particle ); 
-                        
-
-                    }
-                }
-
-                for ( var ix = 0; ix < AMOUNTX+1; ix ++ ) 
-                {
-                    for ( var iy = 0; iy < AMOUNTY+1; iy ++ ) 
-                    {
-                        vel = velocity[ i ++ ] = new THREE.Sprite( material );
-                       
-
-                        vel.H = 1;
-                        vel.U = 0;
-                        vel.V = 0;
-
-                    }
-                }
-
-                
-
-
+                window.addEventListener( 'resize', onWindowResize, false );
 
             }
 
 
-            function animate() 
-            {
+            function onWindowResize() {
+
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+
+                renderer.setSize( window.innerWidth, window.innerHeight );
+
+                controls.handleResize();
+
+            }
+
+
+
+            function animate() {
+
                 requestAnimationFrame( animate );
 
                 render();
                 stats.update();
+
             }
 
-            function render() 
-            {
+            function render() {
 
-                var i = 0;
-
-                for ( var ix = 0; ix < AMOUNTX; ix ++ ) 
-                {
-                    for ( var iy = 0; iy < AMOUNTY; iy ++ ) 
-                    {
-                        particle = particles[ i++ ];
-                        
-                        
-                        //Do something about reflection
-
-
-
-                        //FIRST HALF STEP
-
-                        //height
-                        //particles[i].Hx = (velocity[i + 1 + AMOUNTX].H + velocity[i + 1].H)/2 - dt/(2*dx)*(velocity[i + 1 + AMOUNTX].U - velocity[i + 1].U)
-
-
-
-
-
-                        //particle.H -= Math.random() * .1;
-                        //particle.position.y += particle.H; 
-
-
-
-
-                        //( Math.sin( ( ix + count ) )  ) +
-                          //( Math.sin( ( iy + count ) )  );
-                        
-                    }
-                }
-
-
-
-                if(sphere.position.y > 0)
-                    sphere.position.y -= 0.5;
-                else 
-                    sphere.position.y = 150;
-
+                //controls.update( clock.getDelta() );
                 renderer.render( scene, camera );
-
-                count += 0.1;
 
             }
 
         </script>
+
     </body>
 </html>
