@@ -64,6 +64,7 @@
         <script src="js/Detector.js"></script>
         <script src="js/libs/stats.min.js"></script>
         <script src="stats.min.js"></script>
+        <script src="OrbitControls.js"></script>
 
         <script>
 
@@ -84,9 +85,12 @@
                 scene = new THREE.Scene();
 
                 camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
-
                 camera.position.set(60,60,100);
                 camera.lookAt( scene.position );
+
+                controls = new THREE.OrbitControls( camera );
+                controls.daming = 0.2;
+                controls.addEventListener( 'change', render );
 
                 //Material for raindrop
                 pmaterial = new THREE.PointCloudMaterial({
@@ -235,6 +239,7 @@
 
                 render();
                 stats.update();
+                controls.update();
 
             }
 
@@ -278,8 +283,9 @@
                 //LAX WENDROFF
 
                 //Första steget: 
-
-                for ( var i = 0; i < ( (row - 1) * (row - 2)); i++ )
+                
+                //X-LED
+                for ( var i = 0; i < ( (row + 1) * (row )); i++ )
                 {
                     Hx[i] = (( geometry.vertices[i + 41].z + geometry.vertices[i + 40].z ) / 2 ) - (dt / (2 * dx)) * ( U[i + 41] - U[i + 40]);
                     Ux[i] = (( 0.5 * ( U[i + 41] + U[i + 40] ) - ( dt / (2 * dx)) * ( Math.pow(U[i + 41], 2) + (( 0.5 * g * geometry.vertices[i + 41].z - ( Math.pow( U[i + 40], 2) + 0.5 * g * geometry.vertices[i + 40].z ))))));
@@ -287,7 +293,8 @@
 
                 }
 
-                for( var i = 0; i < ((row - 2) * (row - 1 )); i++)
+                //Y-LED
+                for( var i = 0; i < ((row ) * (row + 1 )); i++)
                 {
                     Hy[i] = 0.5 * ( geometry.vertices[i + 41].z + geometry.vertices[i + 1].z ) - (dt / ( 2 * dy )) * ( V[ i + 41] - V[i + 1] );
                     Uy[i] = 0.5 * ( U[i + 1 ] + U[i + 41] ) - (dt / (2 * dy)) * (( V[i + 41] * U[i + 41] - V[i + 1] * U[i + 1] ));
@@ -296,7 +303,7 @@
 
                 //Andra steget:
 
-                for( var i = 41; i < ((row - 2) * (row - 1 )); i++)
+                for( var i = 41; i < ((row ) * (row + 1 )); i++)
                 {
                     geometry.vertices[i].z = geometry.vertices[i].z - (dt/dx) * ( Ux[i - 40] - Ux[i - 41] ) - (dt / dy) * (Vy[i - 1] - Vy[i - 41]);
                     
