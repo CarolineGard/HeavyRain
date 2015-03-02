@@ -88,6 +88,37 @@
                 camera.position.set(60,60,100);
                 camera.lookAt( scene.position );
 
+                //Material for raindrop
+                pmaterial = new THREE.PointCloudMaterial({
+                    color: 0xFFFFFF,
+                    size: 2,
+                    map: THREE.ImageUtils.loadTexture(
+                        "images/sprite.png"
+                    ),
+                    //blending: THREE.AdditiveBlending,
+                    transparent: true
+                });
+
+                //create the raindrops
+                geomparticle = new THREE.Geometry();
+
+                //Create where they will be
+                for ( i = 0; i < 5; i ++ ) {
+
+                    var vertex = new THREE.Vector3();
+                    vertex.x = Math.random() * 100 - 50;
+                    vertex.y = Math.random() * 100 - 50;
+                    vertex.z = Math.random() * 100 - 50;
+
+                    geomparticle.vertices.push( vertex );
+
+                }
+
+                //create the particles
+                particles = new THREE.PointCloud( geomparticle, pmaterial);
+
+                //add to scene 
+                scene.add(particles);
 
                 var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
                 geometry = new THREE.PlaneGeometry( 100, 100, 40, 40 );
@@ -212,6 +243,18 @@
                 var dx = 1, dy = 1, dt = 0.05, g = 9.81;   //dt = 1/60 
                 var row = 40;
 
+                //Rain falling behaviour
+                for(var p = 0; p < particles.geometry.vertices.length; p++){
+                    particles.geometry.vertices[p].y -= 1.3;
+                    if(particles.geometry.vertices[p].y < 0){
+                        //fall random
+                        particles.geometry.vertices[p].y = Math.random() * 100 - 50;
+                        particles.geometry.vertices[p].z = Math.random() * 100 - 50;
+                        //Reset height
+                        particles.geometry.vertices[p].y = Math.random()*70;
+                    }
+                }
+
                 //Reflective boundary conditions
                 for(var i = 0; i < row; i++)
                 {
@@ -263,9 +306,11 @@
                 }
 
                 meshen.geometry.verticesNeedUpdate = true;
+                particles.geometry.verticesNeedUpdate = true;
 
                 //controls.update( clock.getDelta() );
                 renderer.render( scene, camera );
+
 
             }
 
