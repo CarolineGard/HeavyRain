@@ -123,8 +123,10 @@
                 geometry.vertices[271].z = 15;
                 geometry.vertices[272].z = 15;
 
+                
 
-                // var dx = 1, dy = 1, dt = 1/60, g = 9.81;
+
+                // var dx = 1, dy = 1, dt = 1/60, g = 9.81; 
                 
                 var theRow = 40;
 
@@ -207,12 +209,32 @@
 
             function render() {
 
+                var dx = 1, dy = 1, dt = 0.05, g = 9.81;   //dt = 1/60 
+                var row = 40;
+
+                //Reflective boundary conditions
+                for(var i = 0; i < row; i++)
+                {
+                    geometry.vertices[i*row].z = geometry.vertices[(i*row) + 1].z;
+                    geometry.vertices[(i*row) + 39].z = geometry.vertices[(i*row) + 38].z;    
+                    geometry.vertices[i].z = geometry.vertices[i + row].z;
+                    geometry.vertices[39*row + i].z = geometry.vertices[38*row + i].z;   
+                    
+                    U[i*row].z = U[(i*row) + 1].z;
+                    U[(i*row) + 39].z = U[(i*row) + 38].z;    
+                    U[i].z = - U[i + row].z;
+                    U[39*row + i].z = - U[38*row + i].z;  
+                    
+                    V[i*row].z = - V[(i*row) + 1].z;
+                    V[(i*row) + 39].z = - V[(i*row) + 38].z;    
+                    V[i].z = V[i + row].z;
+                    V[39*row + i].z = V[38*row + i].z;                   
+                }                
+
+
                 //LAX WENDROFF
 
                 //Första steget: 
-                var dx = 1, dy = 1, dt = 1/60, g = 9.81;    
-                var row = 40;
-
 
                 for ( var i = 0; i < ( (row - 1) * (row - 2)); i++ )
                 {
