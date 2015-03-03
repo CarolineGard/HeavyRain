@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>three.js webgl - geometry - terrain</title>
+        <title>Heavy Rain</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <style>
@@ -29,9 +29,9 @@
 
         </style>
 
-        ////////////////////--SHADERS--/////////////////////////////////
-        //VERTEX-SHADER
-         //<script id="shader-vs" type="x-shader/x-vertex">
+        <!--SHADERS-->
+        <!--VERTEX-SHADER-->
+        <script id="shader-vs" type="x-shader/x-vertex">
          //attribute vec3 aVertexPosition;
 
          //void main() {
@@ -41,20 +41,19 @@
 
          //</script>
 
-         //FRAGMENT-SHADER
-         //<script id="shader-vs" type="x-shader/x-fragment">
+         <!--FRAGMENT-SHADER-->
+        <script id="shader-vs" type="x-shader/x-fragment">
             //void main() {
                 gl_FragColor = vec4( 1.0, 0.0, 0.0 1.0 );
          // }
-        // </script>
+        </script>
 
-        ////////////////////////////////////////////////////////////////
+        
 
     </head>
     <body>
 
         <div id="container"><br /><br /><br /><br /><br />Generating world...</div>
-        <div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl terrain demo<br />(left click: forward, right click: backward)</div>
 
         <script src="js/build/three.min.js"></script>
         
