@@ -84,7 +84,7 @@
                 scene = new THREE.Scene();
 
                 camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
-                camera.position.set(60,60,100);
+                camera.position.set(150,60,100);
                 camera.lookAt( scene.position );
 
                 controls = new THREE.OrbitControls( camera );
@@ -124,12 +124,16 @@
 
                 var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
                 geometry = new THREE.PlaneGeometry( 100, 100, 40, 40 );
-                
                 meshen = new THREE.Mesh( geometry, material );
-                
-                //meshen.doublesided = true;
                 meshen.rotation.x = - Math.PI/2;
-                //meshen.rotation.z = Math.PI;
+
+                
+                //Create Box
+                var theBox = new THREE.BoxGeometry(100, 70, 100, 4);
+                var boxMaterial = new THREE.MeshBasicMaterial( { color: 0xbfd1e5 , side: THREE.BackSide } );
+                var box = new THREE.Mesh(theBox, boxMaterial);
+
+                scene.add(box);
                 scene.add(meshen);
 
                 //startvärden
@@ -191,7 +195,7 @@
 
 
                 renderer = new THREE.WebGLRenderer();
-                renderer.setClearColor( 0xbfd1e5 );
+                renderer.setClearColor( 0x000000 );
                 renderer.setPixelRatio( window.devicePixelRatio );
                 renderer.setSize( window.innerWidth, window.innerHeight );
 
