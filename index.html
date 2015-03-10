@@ -338,24 +338,7 @@
                     particles.geometry.vertices[i].y -= v;
  	            }
 
-                //Reflective boundary conditions
-                for(var i = 0; i < row; i++)
-                {
-                    geometry.vertices[i*row].z = geometry.vertices[(i*row) + 1].z;
-                    geometry.vertices[(i*row) + 40].z = geometry.vertices[(i*row) + 39].z;    
-                    geometry.vertices[i].z = geometry.vertices[i + row].z;
-                    geometry.vertices[40*row + i].z = geometry.vertices[39*row + i].z;   
-                    
-                    U[i*row].z = U[(i*row) + 1].z;
-                    U[(i*row) + 40].z = U[(i*row) + 39].z;    
-                    U[i].z = - U[i + row].z;
-                    U[40*row + i].z = - U[39*row + i].z;  
-                    
-                    V[i*row].z = - V[(i*row) + 1].z;
-                    V[(i*row) + 40].z = - V[(i*row) + 39].z;    
-                    V[i].z = V[i + row].z;
-                    V[40*row + i].z = V[39*row + i].z;                   
-                }                
+                              
 
 
                 //LAX WENDROFF
@@ -402,12 +385,38 @@
                         j++;
                     }
 
-                    geometry.vertices[i].z = geometry.vertices[i].z - (dt/dx) * ( Ux[i - 40] - Ux[i - 41] ) - (dt / dy) * (Vy[i - 1] - Vy[i - 41]);
+                    if( i % 41 == 0)
+                    {
+                        geometry.vertices[i].z = geometry.vertices[i + 1].z;
+                        U[i].z = U[i + 1].z;
+                        V[i].z = - V[i + 1].z;
+                    }
 
-                    
-                    U[i] = U[i] - (dt / dx) * (Math.pow(Ux[i - 40], 2) + ( 0.5 * g * Hx[i - 40] - ( Math.pow(Ux[i - 41], 2) + 0.5 * g * Hx[i - 41] ))) - (dt / dy) * (Vy[i - 1] * Uy[i - 1] - Vy[i - 41] * Uy[i - 41] );
-                    
-                    V[i] = V[i] - (dt / dx) * ( Ux[i - 40] * Vx[i - 40] - Ux[i - 41] * Vx[i - 41] ) - (dt / dy) * (( Math.pow(Vy[i - 1], 2) + 0.5 * g * Hy[i - 1] ) - ( Math.pow(Vy[i - 41], 2) + 0.5 * g * Hy[i - 41] ));
+                    else if( i % 41 == 40)
+                    {
+                        geometry.vertices[i].z = geometry.vertices[i - 1].z;
+                        U[i].z = U[i - 1].z;
+                        V[i].z = - V[i - 1].z;
+                    }
+
+                    else if( i >= 0 + 1599 && i <= 40 + 1599)
+                    {
+                        geometry.vertices[40 + i].z = geometry.vertices[i - 41].z;   
+                        U[40 + i].z = - U[i - 41].z; 
+                        V[40 + i].z = V[i - 41].z; 
+                           
+                    }
+
+                    else
+                    {
+                        geometry.vertices[i].z = geometry.vertices[i].z - (dt / dx) * ( Ux[i - 40] - Ux[i - 41] ) - (dt / dy) * (Vy[i - 1] - Vy[i - 41]);
+                        
+                        U[i] = U[i] - (dt / dx) * (Math.pow(Ux[i - 40], 2) + ( 0.5 * g * Hx[i - 40] - ( Math.pow(Ux[i - 41], 2) + 0.5 * g * Hx[i - 41] ))) - (dt / dy) * (Vy[i - 1] * Uy[i - 1] - Vy[i - 41] * Uy[i - 41] );
+                        
+                        V[i] = V[i] - (dt / dx) * ( Ux[i - 40] * Vx[i - 40] - Ux[i - 41] * Vx[i - 41] ) - (dt / dy) * (( Math.pow(Vy[i - 1], 2) + 0.5 * g * Hy[i - 1] ) - ( Math.pow(Vy[i - 41], 2) + 0.5 * g * Hy[i - 41] ));
+
+                    }
+
                     j=0;
                     
                 }
