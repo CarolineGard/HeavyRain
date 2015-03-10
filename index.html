@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>three.js webgl - geometry - terrain</title>
+        <title>Heavy Rain</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <style>
@@ -28,10 +28,34 @@
             }
 
         </style>
+<<<<<<< HEAD
+=======
+
+        <!--SHADERS-->
+        <!--VERTEX-SHADER-->
+        <script id="shader-vs" type="x-shader/x-vertex">
+         //attribute vec3 aVertexPosition;
+
+         //void main() {
+         // gl_Postition = projectMatrix * modelViewMatrix * vec4(position, 1.0);   
+         //}
+         
+
+         //</script>
+
+         <!--FRAGMENT-SHADER-->
+        <script id="shader-vs" type="x-shader/x-fragment">
+            //void main() {
+                gl_FragColor = vec4( 1.0, 0.0, 0.0 1.0 );
+         // }
+        </script>
+
+        
+
+>>>>>>> f63b51e6e8c8add5c644ceb73de71064f020e89e
     </head>
     <body>
         <div id="container"><br /><br /><br /><br /><br />Generating world...</div>
-        <div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl terrain demo<br />(left click: forward, right click: backward)</div>
 
         <script src="js/build/three.min.js"></script>
         
@@ -96,7 +120,7 @@
                 scene = new THREE.Scene();
 
                 camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
-                camera.position.set(60,60,100);
+                camera.position.set(150,60,100);
                 camera.lookAt( scene.position );
 
                 controls = new THREE.OrbitControls( camera );
@@ -150,6 +174,7 @@
            
                 //Water geometry
                 geometry = new THREE.PlaneGeometry( 100, 100, 40, 40 );
+<<<<<<< HEAD
                 
                 //Create water
                 meshen = new THREE.Mesh( geometry, material );
@@ -158,6 +183,17 @@
                 meshen.rotation.x = - Math.PI/2;
                 
                 //Add water to the scene
+
+                meshen = new THREE.Mesh( geometry, material );
+                meshen.rotation.x = - Math.PI/2;
+
+                
+                //Create Box
+                var theBox = new THREE.BoxGeometry(100, 70, 100, 4);
+                var boxMaterial = new THREE.MeshBasicMaterial( { color: 0xbfd1e5 , side: THREE.BackSide } );
+                var box = new THREE.Mesh(theBox, boxMaterial);
+
+                scene.add(box);
                 scene.add(meshen);
 
                 //Initial water position
@@ -200,7 +236,7 @@
 
 
                 renderer = new THREE.WebGLRenderer();
-                renderer.setClearColor( 0xbfd1e5 );
+                renderer.setClearColor( 0x000000 );
                 renderer.setPixelRatio( window.devicePixelRatio );
                 renderer.setSize( window.innerWidth, window.innerHeight );
 
