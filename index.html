@@ -28,31 +28,8 @@
             }
 
         </style>
-
-        ////////////////////--SHADERS--/////////////////////////////////
-        //VERTEX-SHADER
-         //<script id="shader-vs" type="x-shader/x-vertex">
-         //attribute vec3 aVertexPosition;
-
-         //void main() {
-         // gl_Postition = projectMatrix * modelViewMatrix * vec4(position, 1.0);   
-         //}
-         
-
-         //</script>
-
-         //FRAGMENT-SHADER
-         //<script id="shader-vs" type="x-shader/x-fragment">
-            //void main() {
-                gl_FragColor = vec4( 1.0, 0.0, 0.0 1.0 );
-         // }
-        // </script>
-
-        ////////////////////////////////////////////////////////////////
-
     </head>
     <body>
-
         <div id="container"><br /><br /><br /><br /><br />Generating world...</div>
         <div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl terrain demo<br />(left click: forward, right click: backward)</div>
 
@@ -64,6 +41,41 @@
         <script src="js/libs/stats.min.js"></script>
 
         <script src="js/controls/OrbitControls.js"></script>
+        <script src="js/FresnelShader.js"></script>
+
+
+        <!--SHADERS-->
+        <!--VERTEX SHADER-->
+         <script id="vertexShader" type="x-shader/x-vertex">
+            varying vec2 vUv;
+            void main() 
+            {
+                /*
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );   */
+            }
+         </script>
+
+         <!--FRAGMENT SHADER-->
+         <script id="fragmentShader" type="x-shader/x-fragment">
+            uniform sampler2D baseTexture;
+            uniform float baseSpeed;
+            uniform sampler2D noiseTexture;
+            uniform float noiseScale;
+            uniform float alpha;
+            uniform float time;
+            varying vec2 vUv;
+            void main() 
+            {/*
+                vec2 uvTimeShift = vUv + vec2( -0.7, 1.5 ) * time * baseSpeed;
+                vec4 noiseGeneratorTimeShift = texture2D( noiseTexture, uvTimeShift );
+                vec2 uvNoiseTimeShift = vUv + noiseScale * vec2( noiseGeneratorTimeShift.r, noiseGeneratorTimeShift.b );
+                vec4 baseColor = texture2D( baseTexture, uvNoiseTimeShift );
+                baseColor.a = alpha;
+                gl_FragColor = baseColor;*/
+            }
+        </script>
+
 
         <script>
 
@@ -78,8 +90,8 @@
             init();
             animate();
 
-            function init() {
-
+            function init() 
+            {
                 container = document.getElementById( 'container' );
                 scene = new THREE.Scene();
 
@@ -91,7 +103,13 @@
                 controls.daming = 0.2;
                 controls.addEventListener( 'change', render );
 
-                //Material for raindrop
+                //-----LIGHT---------------------------------
+                var light = new THREE.PointLight(0xffffff);
+                light.position.set(0,250,0);
+                scene.add(light);
+                
+                //-----RAIN DROPS----------------------------
+                //Drop material
                 pmaterial = new THREE.PointCloudMaterial({
                     color: 0xFFFFFF,
                     size: 2,
@@ -102,11 +120,12 @@
                     transparent: true
                 });
 
-                //create the raindrops
+                //Create drop geometry
                 geomparticle = new THREE.Geometry();
 
-                //Create where they will be
-                for ( i = 0; i < 5; i ++ ) {
+                //Set initial drop position
+                for ( i = 0; i < 5; i ++ ) 
+                {
 
                     var vertex = new THREE.Vector3();
                    	vertex.x = Math.round(Math.random() * 94 - 47);
@@ -116,49 +135,39 @@
 
                 }
 
-                //create the particles
+                //Create drop
                 particles = new THREE.PointCloud( geomparticle, pmaterial);
 
-                //add to scene 
+                //Add drop to scene 
                 scene.add(particles);
 
+
+                //---------WATER----------------------------------
+                //Water material
+                
+
                 var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+           
+                //Water geometry
                 geometry = new THREE.PlaneGeometry( 100, 100, 40, 40 );
                 
+                //Create water
                 meshen = new THREE.Mesh( geometry, material );
                 
-                //meshen.doublesided = true;
+                //Rotate the water plane
                 meshen.rotation.x = - Math.PI/2;
-                //meshen.rotation.z = Math.PI;
+                
+                //Add water to the scene
                 scene.add(meshen);
 
-                //startvärden
+                //Initial water position
                 geometry.vertices.z = 1;
-                /*
-                geometry.vertices[150].z = 15;
-                geometry.vertices[151].z = 15;
-                geometry.vertices[152].z = 15;
-                geometry.vertices[190].z = 20;
-                geometry.vertices[192].z = 20;
-                geometry.vertices[191].z = 20;
-                geometry.vertices[230].z = 20;
-                geometry.vertices[231].z = 20;
-                geometry.vertices[232].z = 20;
-                geometry.vertices[233].z = 15;
-                geometry.vertices[229].z = 15;
-                geometry.vertices[270].z = 15;
-                geometry.vertices[189].z = 15;
-                geometry.vertices[193].z = 15;
-                geometry.vertices[271].z = 15;
-                geometry.vertices[272].z = 15;*/
-
-                
                 
                 var theRow = 40;
 
-                //LAX WENDROFF stegmetod/////////////////////////////////////
 
-                H = new Array();
+
+                //--------LAX WENDROFF stegmetod-------------------
                 U = new Array();
                 V = new Array();
 
@@ -211,43 +220,46 @@
             }
 
 
-            function onWindowResize() {
-
+            function onWindowResize() 
+            {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
 
                 renderer.setSize( window.innerWidth, window.innerHeight );
 
                 controls.handleResize();
-
             }
 
 
 
-            function animate() {
+            function animate() 
+            {
 
                 requestAnimationFrame( animate );
 
                 render();
                 stats.update();
                 controls.update();
+  
 
             }
 
-            function render() {
-
-                var dx = 1, dy = 1, dt = 0.05, g = 9.81, v = 1.3, h;   //dt = 1/60 
+            function render() 
+            {
+                var dx = 1, dy = 1, dt = 0.05, g = 9.81, v = 1.3, h;   //dt = 1/60, v = 1.3 m/s
                 var row = 40;
                 var posRain = new Array();
                 var j;
 
-                h = (Math.pow(v,2))/(2*g);
+                h = (Math.pow(v,2))/(2*g)*100;
+                console.log(Math.abs(h));
 
 
                 //Rain falling behaviour
                 for(var p = 0; p < particles.geometry.vertices.length; p++)
                 {
-                    particles.geometry.vertices[p].y -= v;
+                   // s = s - dt*Vt
+                    particles.geometry.vertices[p].y -= 130/60;
  	            }
 
                 //Reflective boundary conditions
@@ -302,7 +314,7 @@
                         	&& Math.abs(particles.geometry.vertices[j].y - geometry.vertices[i].z) < 1)
                         {
 							//console.log(Math.abs("hej"))
-							geometry.vertices[i].z = 3;
+							geometry.vertices[i].z = 0.5*h;
 
 							particles.geometry.vertices[j].x = Math.round(Math.random() * 94 - 47);
                         	particles.geometry.vertices[j].z = Math.round(Math.random() * 94 - 47);
