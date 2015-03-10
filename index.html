@@ -199,14 +199,37 @@
                 geometry = new THREE.PlaneGeometry( 100, 100, 40, 40 );
                 meshen = new THREE.Mesh( geometry, material );
                 meshen.rotation.x = - Math.PI/2;
+
                 
                 //Create Box
-                var theBox = new THREE.BoxGeometry(100, 70, 100, 4);
+                var theBox = new THREE.BoxGeometry(100, 70, 100, 1);
                 var boxMaterial = new THREE.MeshBasicMaterial( { color: 0xbfd1e5 , side: THREE.BackSide, map: THREE.ImageUtils.loadTexture('images/kakel3.jpg') } );
-                var box = new THREE.Mesh(theBox, boxMaterial);
+                var box = new THREE.Mesh(theBox, boxMaterial); 
 
                 scene.add(box);
                 scene.add(meshen);
+
+                //startvärden
+                geometry.vertices.z = 1;
+                /*
+                geometry.vertices[150].z = 15;
+                geometry.vertices[151].z = 15;
+                geometry.vertices[152].z = 15;
+                geometry.vertices[190].z = 20;
+                geometry.vertices[192].z = 20;
+                geometry.vertices[191].z = 20;
+                geometry.vertices[230].z = 20;
+                geometry.vertices[231].z = 20;
+                geometry.vertices[232].z = 20;
+                geometry.vertices[233].z = 15;
+                geometry.vertices[229].z = 15;
+                geometry.vertices[270].z = 15;
+                geometry.vertices[189].z = 15;
+                geometry.vertices[193].z = 15;
+                geometry.vertices[271].z = 15;
+                geometry.vertices[272].z = 15;*/
+
+                
                 
                 var theRow = 40;
 
@@ -295,7 +318,7 @@
                 var posRain = new Array();
                 var j;
 
-                h = ( Math.pow(v, 2) ) / (2 * g);
+                h = (Math.pow(v,2))/(2*g);
 
                 //Rain falling behaviour
                 for (var i = 1; i < guiControls.rainAmount; i++) {
