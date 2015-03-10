@@ -104,7 +104,7 @@
             var camera, controls, scene, renderer;
             var mesh, texture;
 
-            var attributes, uniforms;
+            var attributes, uniforms, min = 1, max = 20;
 
             var clock = new THREE.Clock();
 
@@ -134,7 +134,7 @@
                 // }
 
                 var gui = new dat.GUI();
-                gui.add(guiControls, 'rainAmount').min(1).max(20).step(1);
+                gui.add(guiControls, 'rainAmount').min(min).max(max).step(1);
 
 
 
@@ -178,7 +178,7 @@
                 geomparticle = new THREE.Geometry();
 
                 //Create where they will be
-                for ( i = 0; i < 20; i ++ ) {
+                for ( i = 0; i < max; i ++ ) {
 
                     var vertex = new THREE.Vector3();
                    	vertex.x = Math.round(Math.random() * 94 - 47);
@@ -321,21 +321,21 @@
                 h = (Math.pow(v,2))/(2*g);
 
                 //Rain falling behaviour
-                for (var i=1; i<guiControls.rainAmount; i++) {
+                for (var i = 1; i < guiControls.rainAmount; i++) {
                     particles.geometry.vertices[i].visible = true;
                     attributes.alpha.value[ i ] = 1.0;
                     attributes.alpha.needsUpdate = true;
                 }
-                for (var i=guiControls.rainAmount; i<particles.geometry.vertices.length; i++) {
+                for (var i = guiControls.rainAmount; i < particles.geometry.vertices.length; i++) {
                     particles.geometry.vertices[i].visible = false;
                     attributes.alpha.value[ i ] = 0.0;
                     attributes.alpha.needsUpdate = true;
 
                 }
 
-                for(var p = 0; p < guiControls.rainAmount ; p++)
+                for(var i = 0; i < guiControls.rainAmount ; i++)
                 {
-                    particles.geometry.vertices[p].y -= v;
+                    particles.geometry.vertices[i].y -= v;
  	            }
 
                 //Reflective boundary conditions
