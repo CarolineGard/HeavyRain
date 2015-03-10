@@ -48,6 +48,7 @@
          // }
         </script>
 
+        <!-- Vertex shader for rain material -->
         <script type="x-shader/x-vertex" id="vertexshader">
 
             attribute float alpha;
@@ -60,14 +61,13 @@
 
                 vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-                gl_PointSize = 2.0;
+                gl_PointSize = 3.0;
 
                 gl_Position = projectionMatrix * mvPosition;
 
             }
-
         </script>
-
+        <!-- Fragment shader for rain material -->
         <script type="x-shader/x-fragment" id="fragmentshader">
 
                     uniform vec3 color;
@@ -128,43 +128,26 @@
                 controls.daming = 0.2;
                 controls.addEventListener( 'change', render );
 
-                //GUI for changing values
-                // var guiControls = new function() {
-                //     this.rainAmount = 5;
-                // }
-
+                // GUI for changing amount of rain
                 var gui = new dat.GUI();
                 gui.add(guiControls, 'rainAmount').min(min).max(max).step(1);
 
-
-
-
-                //Material for raindrop
-                pmaterial = new THREE.PointCloudMaterial({
-                    color: 0xFFFFFF,
-                    size: 2,
-                    map: THREE.ImageUtils.loadTexture(
-                        "images/sprite.png"
-                    ),
-                    //blending: THREE.AdditiveBlending,
-                    transparent: true
-                });
-
+                // Attribute for alpha channel on raindrop material
                 attributes = {
 
                     alpha: { type: 'f', value: [] },
 
                 };
 
-                // uniforms
+                // Color of the raindrop
                 uniforms = {
 
                     color: { type: "c", value: new THREE.Color( 0x0066CC ) },
 
                 };
 
-                  // point cloud material
-                var shaderMaterial = new THREE.ShaderMaterial( {
+                // Point cloud material
+                var particleMaterial = new THREE.ShaderMaterial( {
 
                     uniforms:       uniforms,
                     attributes:     attributes,
@@ -174,10 +157,10 @@
 
                 });
 
-                //create the raindrops
+                // Create the geometry of the raindrops
                 geomparticle = new THREE.Geometry();
 
-                //Create where they will be
+                // and add the starting position for the geometries
                 for ( i = 0; i < max; i ++ ) {
 
                     var vertex = new THREE.Vector3();
@@ -189,10 +172,10 @@
 
                 }
 
-                //create the particles
-                particles = new THREE.PointCloud( geomparticle, shaderMaterial);
+                // Create the particles with geometry and material
+                particles = new THREE.PointCloud( geomparticle, particleMaterial);
 
-                //add to scene 
+                // Add particles to scene 
                 scene.add(particles);
 
                 var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
@@ -201,7 +184,7 @@
                 meshen.rotation.x = - Math.PI/2;
 
                 
-                //Create Box
+                // Create Box
                 var theBox = new THREE.BoxGeometry(100, 70, 100, 1);
                 var boxMaterial = new THREE.MeshBasicMaterial( { color: 0xbfd1e5 , side: THREE.BackSide, map: THREE.ImageUtils.loadTexture('images/kakel3.jpg') } );
                 var box = new THREE.Mesh(theBox, boxMaterial); 
@@ -311,34 +294,39 @@
 
             }
 
+            // Render-loop, this will update everything that happens in the scene
             function render() {
 
-                var dx = 1, dy = 1, dt = 0.05, g = 9.81, v = 1.3, h;   //dt = 1/60 
+                var dx = 1, dy = 1, dt = 0.05, g = 9.81, v = 1.3, vCM = (v/60)*100, h;   //dt = 1/60 
                 var row = 40;
                 var posRain = new Array();
                 var j;
 
-                h = (Math.pow(v,2))/(2*g);
+                h = (Math.pow(v,2))/(2*g)*100;
 
-                //Rain falling behaviour
+                // Raindrops falling behaviour
+
+                // This controls the amount of visible raindrops
+                // and sets the alpha channel to 1 if the are visible
                 for (var i = 1; i < guiControls.rainAmount; i++) {
                     particles.geometry.vertices[i].visible = true;
                     attributes.alpha.value[ i ] = 1.0;
                     attributes.alpha.needsUpdate = true;
                 }
+                // If they should not be seen in the scene, 
+                // the alpha channel is set to 0 (invisible)
                 for (var i = guiControls.rainAmount; i < particles.geometry.vertices.length; i++) {
                     particles.geometry.vertices[i].visible = false;
-                    attributes.alpha.value[ i ] = 0.0;
+                    attributes.alpha.value[i] = 0.0;
                     attributes.alpha.needsUpdate = true;
 
                 }
 
+                // Sets the speed of the raindrops
                 for(var i = 0; i < guiControls.rainAmount ; i++)
                 {
-                    particles.geometry.vertices[i].y -= v;
-                }
-
-                              
+                    particles.geometry.vertices[i].y -= vCM;
+                }       
 
 
                 //LAX WENDROFF
@@ -366,18 +354,20 @@
                 //j = 0;
                 for( var i = 41; i < ((row ) * (row + 1 )); i++)
                 {
+                    // This is a loop for the raindrops inpact on the water surface
                     while(j < particles.geometry.vertices.length)
-                    {                    
+                    {       
+                        // If the raindrop is 1.5 cm from the water surface, the raindrop will "reset" and start falling from the sky again meanwhile the water surface gets a height from the momentum of the raindrop
                         if (   Math.abs(particles.geometry.vertices[j].x - geometry.vertices[i].x) < 2.5
                             && Math.abs(particles.geometry.vertices[j].z + geometry.vertices[i].y) < 2.5
-                            && Math.abs(particles.geometry.vertices[j].y - geometry.vertices[i].z) < 1)
+                            && Math.abs(particles.geometry.vertices[j].y - geometry.vertices[i].z) < 1.5)
                         {
-                            //console.log(Math.abs("hej"))
+                            // Set the height of the water
                             geometry.vertices[i].z = 3;
 
+                            // Reset the drop so that it falls from the sky again
                             particles.geometry.vertices[j].x = Math.round(Math.random() * 94 - 47);
                             particles.geometry.vertices[j].z = Math.round(Math.random() * 94 - 47);
-                            //Reset height
                             particles.geometry.vertices[j].y = Math.random() * 50 + 50;
 
                         }
