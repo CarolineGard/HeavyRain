@@ -1,37 +1,39 @@
 clc
 
-g = 9.81;
-dx = 1.0;
-dy = 1.0;
-dt = 0.05; 
+g = 9.81; %Gravity
+dx = 1.0; %x movement  
+dy = 1.0; %y movement
+dt = 0.05; % time step
 
-H = ones(41:41); 
-U = zeros(41:41); %hastighet i x-led
-V = zeros(41:41); %hastighet i y-led (obs negativ!)
+H = ones(41:41);  %Height of plane 
+U = zeros(41:41); %Velocity in x-direction
+V = zeros(41:41); %Velocity in y-direction (negative)
 
-Hx = zeros(40:40);
-Ux = zeros(40:40);
-Vx = zeros(40:40);
+%intended for the calculations in first step, Lax Wendroff
+Hx = zeros(40:40); 
+Ux = zeros(40:40); 
+Vx = zeros(40:40); 
 
 Hy = zeros(40:40);
 Uy = zeros(40:40);
 Vy = zeros(40:40);
 
+%Color of the plane, dependent on velocity
 C = zeros(40:40);
 
-%Skapa initial displacement
+%Create initial displacement
 [x, y] = meshgrid( linspace(-4, 4, 10) );
 R = sqrt(x.^2 + y.^2) + eps;
 Z = (sin(R)./R);
 Z = max(Z,0);
 
-%Skapa displacement to the height matrix
+%Create displacement to the height matrix
 w = size(Z,1);
 t = 10:w+9;
 l = 20:w+19;
 H(t,l) = H(t, l) + Z;
 
-%Sätt upp grids
+%Grids
 clf 
 shg
 n = 40;
@@ -41,23 +43,33 @@ hold all;
 
  while 1 == 1  
     
-    C = abs(U(i,j)) + abs(V(i,j));
-    set(grid, 'zdata', H(i,j), 'cdata', C);
-    axis off;
-    drawnow   
+     C = abs(U(i,j)) + abs(V(i,j)); %Calculate the colors for all points in the plane
+     set(grid, 'zdata', H(i,j), 'cdata', C);
+     axis off;
+     drawnow   
     
-     % Reflective boundary conditions Inte vår kod!!
-     H(:,1) = H(:,2);      U(:,1) = U(:,2);       V(:,1) = -V(:,2);
-     H(:,n+2) = H(:,n+1);  U(:,n+2) = U(:,n+1);   V(:,n+2) = -V(:,n+1);
-     H(1,:) = H(2,:);      U(1,:) = -U(2,:);      V(1,:) = V(2,:);
-     H(n+2,:) = H(n+1,:);  U(n+2,:) = -U(n+1,:);  V(n+2,:) = V(n+1,:);
+     % Reflective boundary conditions
+     H(:,1) = H(:,2);             
+     H(:,n+2) = H(:,n+1);     
+     H(1,:) = H(2,:);           
+     H(n+2,:) = H(n+1,:);    
     
-    %Lax- Wendroff 2-stegsmetod
+     U(:,1) = U(:,2);
+     U(:,n+2) = U(:,n+1);
+     U(1,:) = -U(2,:);
+     U(n+2,:) = -U(n+1,:);
+     
+     V(:,1) = -V(:,2);
+     V(:,n+2) = -V(:,n+1);
+     V(1,:) = V(2,:);
+     V(n+2,:) = V(n+1,:);
+     
+     
+    %Lax- Wendroff Step method
     
     %FIRST STEP
-    %Dela allt med H i samma punkt
 
-    %X-LED
+    %X-direction
     i = 1:38+1;
     j = 1:38;
 
@@ -72,7 +84,7 @@ hold all;
                 - (dt/2*dx)*((U(i+1,j+1).*V(i+1,j+1) ...
                 - U(i,j+1).*V(i,j+1)));    
 
-    %Y-LED
+    %Y-direction
     i = 1:38;
     j = 1:38+1;
     
@@ -87,9 +99,9 @@ hold all;
                + 0.5*g*H(i+1,j+1) - (V(i+1,j).^2 ...
                + 0.5*g*H(i+1,j)));
 
-
-                  
-    %ANDRA STEGET
+       
+    %SECOND STEP
+    
     i = 2:38+1;
     j = 2:38;
 
@@ -104,7 +116,8 @@ hold all;
                       + 0.5*g*Hy(i-1,j)) - (Vy(i-1,j-1).^2 + 0.5*g*Hy(i-1,j-1))) ...
                       - (dt/dx)*(Ux(i,j-1).*Vx(i,j-1) - Ux(i-1, j-1).*Vx(i-1,j-1)); 
 
-
+    
+    %If H is not a number
     if all(all(isnan(H))), break, end
     
  end
