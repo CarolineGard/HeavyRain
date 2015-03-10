@@ -28,31 +28,6 @@
             }
 
         </style>
-<<<<<<< HEAD
-=======
-
-        <!--SHADERS-->
-        <!--VERTEX-SHADER-->
-        <script id="shader-vs" type="x-shader/x-vertex">
-         //attribute vec3 aVertexPosition;
-
-         //void main() {
-         // gl_Postition = projectMatrix * modelViewMatrix * vec4(position, 1.0);   
-         //}
-         
-
-         //</script>
-
-         <!--FRAGMENT-SHADER-->
-        <script id="shader-vs" type="x-shader/x-fragment">
-            //void main() {
-                gl_FragColor = vec4( 1.0, 0.0, 0.0 1.0 );
-         // }
-        </script>
-
-        
-
->>>>>>> f63b51e6e8c8add5c644ceb73de71064f020e89e
     </head>
     <body>
         <div id="container"><br /><br /><br /><br /><br />Generating world...</div>
@@ -66,39 +41,9 @@
 
         <script src="js/controls/OrbitControls.js"></script>
         <script src="js/FresnelShader.js"></script>
+        
 
 
-        <!--SHADERS-->
-        <!--VERTEX SHADER-->
-         <script id="vertexShader" type="x-shader/x-vertex">
-            varying vec2 vUv;
-            void main() 
-            {
-                /*
-                vUv = uv;
-                gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );   */
-            }
-         </script>
-
-         <!--FRAGMENT SHADER-->
-         <script id="fragmentShader" type="x-shader/x-fragment">
-            uniform sampler2D baseTexture;
-            uniform float baseSpeed;
-            uniform sampler2D noiseTexture;
-            uniform float noiseScale;
-            uniform float alpha;
-            uniform float time;
-            varying vec2 vUv;
-            void main() 
-            {/*
-                vec2 uvTimeShift = vUv + vec2( -0.7, 1.5 ) * time * baseSpeed;
-                vec4 noiseGeneratorTimeShift = texture2D( noiseTexture, uvTimeShift );
-                vec2 uvNoiseTimeShift = vUv + noiseScale * vec2( noiseGeneratorTimeShift.r, noiseGeneratorTimeShift.b );
-                vec4 baseColor = texture2D( baseTexture, uvNoiseTimeShift );
-                baseColor.a = alpha;
-                gl_FragColor = baseColor;*/
-            }
-        </script>
 
 
         <script>
@@ -107,8 +52,6 @@
             var container, stats;
             var camera, controls, scene, renderer;
             var mesh, texture;
-
-            var clock = new THREE.Clock();
 
 
             init();
@@ -128,9 +71,16 @@
                 controls.addEventListener( 'change', render );
 
                 //-----LIGHT---------------------------------
-                var light = new THREE.PointLight(0xffffff);
-                light.position.set(0,250,0);
-                scene.add(light);
+                // add subtle ambient lighting
+                var ambientLight = new THREE.AmbientLight('withe');
+                scene.add(ambientLight);
+                // add spotlight for the shadows
+                var spotLight = new THREE.SpotLight('white');
+                spotLight.position.set(50,90,-90);
+                spotLight.castShadow = true;
+                scene.add(spotLight);
+
+
                 
                 //-----RAIN DROPS----------------------------
                 //Drop material
@@ -168,25 +118,19 @@
 
                 //---------WATER----------------------------------
                 //Water material
-                
-
-                var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+                var material = new THREE.MeshPhongMaterial( { ambient: 0x030303, diffuse:'white', color: '#2E5C8A',  shininess: 50, transparent: true,
+                                                            refractionRatio: 0});
+               
+               
            
                 //Water geometry
                 geometry = new THREE.PlaneGeometry( 100, 100, 40, 40 );
-<<<<<<< HEAD
                 
                 //Create water
                 meshen = new THREE.Mesh( geometry, material );
                 
                 //Rotate the water plane
                 meshen.rotation.x = - Math.PI/2;
-                
-                //Add water to the scene
-
-                meshen = new THREE.Mesh( geometry, material );
-                meshen.rotation.x = - Math.PI/2;
-
                 
                 //Create Box
                 var theBox = new THREE.BoxGeometry(100, 70, 100, 4);
@@ -272,6 +216,7 @@
             {
 
                 requestAnimationFrame( animate );
+                
 
                 render();
                 stats.update();
@@ -294,8 +239,9 @@
                 //Rain falling behaviour
                 for(var p = 0; p < particles.geometry.vertices.length; p++)
                 {
-                   // s = s - dt*Vt
-                    particles.geometry.vertices[p].y -= 130/60;
+                    //Eulers stegmetod, dt = 1/60
+                    //y = y - dt*Vt
+                    particles.geometry.vertices[p].y -= (v/60)*100;
  	            }
 
                 //Reflective boundary conditions
