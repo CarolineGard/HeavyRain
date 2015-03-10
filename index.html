@@ -48,6 +48,38 @@
          // }
         </script>
 
+        <script type="x-shader/x-vertex" id="vertexshader">
+
+            attribute float alpha;
+
+            varying float vAlpha;
+
+            void main() {
+
+                vAlpha = alpha;
+
+                vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+                gl_PointSize = 2.0;
+
+                gl_Position = projectionMatrix * mvPosition;
+
+            }
+
+        </script>
+
+        <script type="x-shader/x-fragment" id="fragmentshader">
+
+                    uniform vec3 color;
+
+                    varying float vAlpha;
+
+                    void main() {
+
+                        gl_FragColor = vec4( color, vAlpha );
+
+                }
+        </script>
         
 
     </head>
@@ -61,6 +93,7 @@
         <script src="js/ImprovedNoise.js"></script>
         <script src="js/Detector.js"></script>
         <script src="js/libs/stats.min.js"></script>
+        <script type="text/javascript" src="js/dat.gui.min.js"></script>
 
         <script src="js/controls/OrbitControls.js"></script>
 
@@ -71,8 +104,13 @@
             var camera, controls, scene, renderer;
             var mesh, texture;
 
+            var attributes, uniforms;
+
             var clock = new THREE.Clock();
 
+            var guiControls = new function() {
+                this.rainAmount = 5;
+            }
 
             init();
             animate();
@@ -90,6 +128,17 @@
                 controls.daming = 0.2;
                 controls.addEventListener( 'change', render );
 
+                //GUI for changing values
+                // var guiControls = new function() {
+                //     this.rainAmount = 5;
+                // }
+
+                var gui = new dat.GUI();
+                gui.add(guiControls, 'rainAmount').min(1).max(20).step(1);
+
+
+
+
                 //Material for raindrop
                 pmaterial = new THREE.PointCloudMaterial({
                     color: 0xFFFFFF,
@@ -101,22 +150,47 @@
                     transparent: true
                 });
 
+                attributes = {
+
+                    alpha: { type: 'f', value: [] },
+
+                };
+
+                // uniforms
+                uniforms = {
+
+                    color: { type: "c", value: new THREE.Color( 0x0066CC ) },
+
+                };
+
+                  // point cloud material
+                var shaderMaterial = new THREE.ShaderMaterial( {
+
+                    uniforms:       uniforms,
+                    attributes:     attributes,
+                    vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+                    fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
+                    transparent:    true
+
+                });
+
                 //create the raindrops
                 geomparticle = new THREE.Geometry();
 
                 //Create where they will be
-                for ( i = 0; i < 5; i ++ ) {
+                for ( i = 0; i < 20; i ++ ) {
 
                     var vertex = new THREE.Vector3();
                    	vertex.x = Math.round(Math.random() * 94 - 47);
                     vertex.z = Math.round(Math.random() * 94 - 47);
                     vertex.y = Math.round(Math.random() * 50 + 50);
+                    attributes.alpha.value[ i ] = 1.0;
                     geomparticle.vertices.push( vertex );
 
                 }
 
                 //create the particles
-                particles = new THREE.PointCloud( geomparticle, pmaterial);
+                particles = new THREE.PointCloud( geomparticle, shaderMaterial);
 
                 //add to scene 
                 scene.add(particles);
@@ -246,9 +320,20 @@
 
                 h = (Math.pow(v,2))/(2*g);
 
-
                 //Rain falling behaviour
-                for(var p = 0; p < particles.geometry.vertices.length; p++)
+                for (var i=1; i<guiControls.rainAmount; i++) {
+                    particles.geometry.vertices[i].visible = true;
+                    attributes.alpha.value[ i ] = 1.0;
+                    attributes.alpha.needsUpdate = true;
+                }
+                for (var i=guiControls.rainAmount; i<particles.geometry.vertices.length; i++) {
+                    particles.geometry.vertices[i].visible = false;
+                    attributes.alpha.value[ i ] = 0.0;
+                    attributes.alpha.needsUpdate = true;
+
+                }
+
+                for(var p = 0; p < guiControls.rainAmount ; p++)
                 {
                     particles.geometry.vertices[p].y -= v;
  	            }
