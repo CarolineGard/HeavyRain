@@ -137,8 +137,6 @@
                 gui.add(guiControls, 'rainAmount').min(min).max(max).step(1);
 
 
-
-
                 //Material for raindrop
                 pmaterial = new THREE.PointCloudMaterial({
                     color: 0xFFFFFF,
@@ -209,29 +207,8 @@
                 scene.add(box);
                 scene.add(meshen);
 
-                //startvärden
-                geometry.vertices.z = 1;
-                /*
-                geometry.vertices[150].z = 15;
-                geometry.vertices[151].z = 15;
-                geometry.vertices[152].z = 15;
-                geometry.vertices[190].z = 20;
-                geometry.vertices[192].z = 20;
-                geometry.vertices[191].z = 20;
-                geometry.vertices[230].z = 20;
-                geometry.vertices[231].z = 20;
-                geometry.vertices[232].z = 20;
-                geometry.vertices[233].z = 15;
-                geometry.vertices[229].z = 15;
-                geometry.vertices[270].z = 15;
-                geometry.vertices[189].z = 15;
-                geometry.vertices[193].z = 15;
-                geometry.vertices[271].z = 15;
-                geometry.vertices[272].z = 15;*/
-
                 
-                
-                var theRow = 40;
+                var row = 40;
 
                 //LAX WENDROFF stegmetod/////////////////////////////////////
 
@@ -247,7 +224,7 @@
                 Vy = new Array();
 
                 
-                for ( var i = 0; i < (theRow * theRow); i++ )
+                for ( var i = 0; i < (row * row); i++ )
                 {
                         Hx.push(0);
                         Hy.push(0);
@@ -257,7 +234,7 @@
                         Vy.push(0);
                 }
 
-                for ( var i = 0; i < ( (theRow + 1) * (theRow + 1) ); i++ )
+                for ( var i = 0; i < ( (row + 1) * (row + 1) ); i++ )
                 {
                         U.push(0);
                         V.push(0);
