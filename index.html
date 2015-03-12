@@ -44,7 +44,7 @@
 
                 vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-                gl_PointSize = 3.0;
+                gl_PointSize = 4.0;
 
                 gl_Position = projectionMatrix * mvPosition;
             }
@@ -106,7 +106,7 @@
 
                 //camera
                 camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
-                camera.position.set(150,60,100);
+                camera.position.set(150, 60, 100);
                 camera.lookAt( scene.position );
 
                 //mouse control
@@ -131,7 +131,7 @@
                 attributes = { alpha: { type: 'f', value: [] }, };
 
                 // Color of the raindrop
-                uniforms = { color: { type: "c", value: new THREE.Color( 0x0066CC ) }, };
+                uniforms = { color: { type: "c", value: new THREE.Color( 0x246BB2 ) }, };
 
                 // Point cloud material
                 var particleMaterial = new THREE.ShaderMaterial( {
