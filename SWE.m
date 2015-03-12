@@ -25,7 +25,7 @@ C = zeros(40:40);
 [x, y] = meshgrid( linspace(-4, 4, 10) );
 R = sqrt(x.^2 + y.^2) + eps;
 Z = (sin(R)./R);
-Z = max(Z,0);
+Z = max(Z,0); 
 
 %Create displacement to the height matrix
 w = size(Z,1);
@@ -41,14 +41,15 @@ grid = surf(H);
 axis([0 41 0 41 -1 3]);
 hold all;
 
- while 1 == 1  
-    
+ while 1 == 1   
+     %draw the plane and the colour in each point
      C = abs(U(i,j)) + abs(V(i,j)); %Calculate the colors for all points in the plane
      set(grid, 'zdata', H(i,j), 'cdata', C);
      axis off;
-     drawnow   
-    
-     % Reflective boundary conditions
+     drawnow
+   
+     % Reflective boundary conditions 
+     % for height H and velocities U and V
      H(:,1) = H(:,2);             
      H(:,n+2) = H(:,n+1);     
      H(1,:) = H(2,:);           
@@ -63,7 +64,6 @@ hold all;
      V(:,n+2) = -V(:,n+1);
      V(1,:) = V(2,:);
      V(n+2,:) = V(n+1,:);
-     
      
     %Lax- Wendroff Step method
     
@@ -101,22 +101,22 @@ hold all;
 
        
     %SECOND STEP
-    
     i = 2:38+1;
     j = 2:38;
-
+    
+    %Height of the plane 
     H(i, j) = H(i, j) - (dt/dx)*(Ux(i,j-1) - Ux(i-1, j-1)) - (dt/dy)*(Vy(i-1,j) - Vy(i-1,j-1));
 
-
+    %Velocity in x-direction
     U(i, j) = U(i, j) - (dt/dx)*(Ux(i,j-1).^2 ... 
                       + (0.5*g*Hx(i,j-1) - (Ux(i-1,j-1).^2 + 0.5*g*Hx(i-1,j-1) ))) ...
                       - (dt/dy)*(Vy(i-1,j).*Uy(i-1,j) - Vy(i-1,j-1).*Uy(i-1,j-1)); 
-              
+    
+    %Velocity in y-direction
     V(i, j) = V(i, j) - (dt/dy)*((Vy(i-1,j).^2 ... 
                       + 0.5*g*Hy(i-1,j)) - (Vy(i-1,j-1).^2 + 0.5*g*Hy(i-1,j-1))) ...
                       - (dt/dx)*(Ux(i,j-1).*Vx(i,j-1) - Ux(i-1, j-1).*Vx(i-1,j-1)); 
-
-    
+                  
     %If H is not a number
     if all(all(isnan(H))), break, end
     
