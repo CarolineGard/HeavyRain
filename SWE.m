@@ -42,12 +42,6 @@ axis([0 41 0 41 -1 3]);
 hold all;
 
  while 1 == 1   
-     %draw the plane and the colour in each point
-     C = abs(U(i,j)) + abs(V(i,j)); %Calculate the colors for all points in the plane
-     set(grid, 'zdata', H(i,j), 'cdata', C);
-     axis off;
-     drawnow
-   
      % Reflective boundary conditions 
      % for height H and velocities U and V
      H(:,1) = H(:,2);             
@@ -116,6 +110,12 @@ hold all;
     V(i, j) = V(i, j) - (dt/dy)*((Vy(i-1,j).^2 ... 
                       + 0.5*g*Hy(i-1,j)) - (Vy(i-1,j-1).^2 + 0.5*g*Hy(i-1,j-1))) ...
                       - (dt/dx)*(Ux(i,j-1).*Vx(i,j-1) - Ux(i-1, j-1).*Vx(i-1,j-1)); 
+    
+     %draw the plane and the colour in each point
+     C = abs(U(i,j)) + abs(V(i,j)); %Calculate the colors for all points in the plane
+     set(grid, 'zdata', H(i,j), 'cdata', C);
+     axis off;
+     drawnow             
                   
     %If H is not a number
     if all(all(isnan(H))), break, end
