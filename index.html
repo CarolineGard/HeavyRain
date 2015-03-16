@@ -100,7 +100,7 @@
 
             function init() {
 
-                //SCENE SETTINGS
+                //-----SCENE SETTINGS------------------------
                 container = document.getElementById( 'container' );
                 scene = new THREE.Scene();
 
@@ -119,6 +119,18 @@
                 var gui = new dat.GUI();
                 gui.add(guiControls, 'rainAmount').min(min).max(max).step(1);
 
+
+                //-----LIGHT---------------------------------
+                // add subtle ambient lighting
+                var ambientLight = new THREE.AmbientLight('blue');
+                scene.add(ambientLight);
+                // add spotlight for the shadows
+                var spotLight = new THREE.SpotLight('white');
+                spotLight.position.set(50,90,-90);
+                spotLight.castShadow = true;
+                scene.add(spotLight);
+
+                //-----RAIN DROPS----------------------------
                 //Material for raindrop
                 pmaterial = new THREE.PointCloudMaterial( {
                     color: 0xFFFFFF,
@@ -165,12 +177,26 @@
                 // Add particles to scene 
                 scene.add(particles);
 
-                var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+                //---------WATER----------------------------------
+                //Water material
+                var waterTexture = THREE.ImageUtils.loadTexture( 'images/water.jpg' );
+                var material = new THREE.MeshPhongMaterial( { 
+                        map: waterTexture, 
+                        ambient: 'blue', 
+                        diffuse:'blue', 
+                        color: '#2E5C8A',  
+                        transparent: true, 
+                        blending: THREE.AdditiveBlending 
+                    });
+
+                //var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+                
                 geometry = new THREE.PlaneGeometry( 100, 100, 40, 40 );
                 mesh = new THREE.Mesh( geometry, material );
                 mesh.rotation.x = - Math.PI/2;
 
                 
+                //--------BOX------------------------------------
                 // Create Box for water
                 var theBox = new THREE.BoxGeometry(100, 70, 100, 1);
                 var boxMaterial = new THREE.MeshBasicMaterial( { color: 0xbfd1e5 , side: THREE.BackSide, map: THREE.ImageUtils.loadTexture('images/kakel6.jpg') } );
@@ -180,6 +206,8 @@
                 scene.add(box);
                 scene.add(mesh);
 
+
+                //--------LAX WENDROFF stegmetod-------------------
                 //Create Arrays for the velocities in each direction U and V
                 U = new Array();
                 V = new Array();
