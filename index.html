@@ -44,7 +44,7 @@
 
                 vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-                gl_PointSize = 4.0;
+                gl_PointSize = 2.0 * (300.0 / length( mvPosition.xyz));
 
                 gl_Position = projectionMatrix * mvPosition;
             }
@@ -82,13 +82,14 @@
         <script type="x-shader/x-fragment" id="fragmentshader">
 
             uniform vec3 color;
+            uniform sampler2D texture;
 
             varying float vAlpha;
 
             void main() 
             {
-
                 gl_FragColor = vec4( color, vAlpha );
+                gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
             }
 
         </script>
@@ -184,20 +185,14 @@
                 renderer.shadowMapEnabled = true;
 
                 //-----RAIN DROPS----------------------------
-
-                //Material for raindrop
-                pmaterial = new THREE.PointCloudMaterial( {
-                    color: 0xFFFFFF,
-                    size: 2,
-                    map: THREE.ImageUtils.loadTexture( "images/sprite.png" ),
-                    transparent: true 
-                } );
-
                 // Attribute for alpha channel on raindrop material
                 attributes = { alpha: { type: 'f', value: [] }, };
 
                 // Color of the raindrop
-                uniforms = { color: { type: "c", value: new THREE.Color( 0x246BB2 ) }, };
+                uniforms = { 
+                    color: { type: "c", value: new THREE.Color( 0xffffff ) },
+                    texture: { type: "t", value: THREE.ImageUtils.loadTexture("images/rain2.png") }
+                };
 
                 // Point cloud material
                 var particleMaterial = new THREE.ShaderMaterial( {
@@ -264,7 +259,7 @@
 
 				//Water material
 
-                var waterTexture = THREE.ImageUtils.loadTexture( 'images/water.jpg' );
+                var waterTexture = THREE.ImageUtils.loadTexture( 'images/water2.png' );
                 /*var material = new THREE.MeshBasicMaterial( { 
                         //map: waterTexture, 
                         //ambient: 'white', 
@@ -281,7 +276,7 @@
 				uniformsW = 
 				{ 
                         amplitude:    { type: 'f', value: 0 }, 
-                        //texImage:    { type: 't', value: waterTexture } 
+                        texImage:    { type: 't', value: waterTexture }, 
                         color: { type: "c", value: new THREE.Color( 0x246BB2 ) }
                 };
 
@@ -298,7 +293,8 @@
                         attributes:     attributesW,    // and the attributes 
                         side:THREE.DoubleSide,        // want the texture on both sides of the wave 
                         vertexShader:   vs,            // pointers to the shaders 
-                        fragmentShader: fs 
+                        fragmentShader: fs,
+                        transparent:    true
                     }); 
 
                 //var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
