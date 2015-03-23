@@ -1,4 +1,5 @@
 clc
+% For recording
 aviobj = VideoWriter('example.avi','Uncompressed AVI');
 aviobj.FrameRate = 60;
 open(aviobj);
@@ -45,8 +46,11 @@ grid = surf(H);
 axis([0 41 0 41 -1 3]);
 hold all;
 
+% To restore like it was before, set while 1 == 1
  while tjohej < 10   
+     % Fixed timestep so that the animation will end
      tjohej = tjohej + 0.01;
+     
      % Reflective boundary conditions 
      % for height H and velocities U and V
      H(:,1) = H(:,2);             
@@ -120,6 +124,8 @@ hold all;
      C = abs(U(i,j)) + abs(V(i,j)); %Calculate the colors for all points in the plane
      set(grid, 'zdata', H(i,j), 'cdata', C);
      axis off;
+     
+     %For recording
      frame = getframe;
      writeVideo(aviobj,frame);       
      drawnow             
