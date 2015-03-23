@@ -1,4 +1,8 @@
 clc
+aviobj = VideoWriter('example.avi','Uncompressed AVI');
+aviobj.FrameRate = 60;
+open(aviobj);
+tjohej= 0.1;
 
 g = 9.81; %Gravity
 dx = 1.0; %x movement  
@@ -41,7 +45,8 @@ grid = surf(H);
 axis([0 41 0 41 -1 3]);
 hold all;
 
- while 1 == 1   
+ while tjohej < 10   
+     tjohej = tjohej + 0.01;
      % Reflective boundary conditions 
      % for height H and velocities U and V
      H(:,1) = H(:,2);             
@@ -115,9 +120,12 @@ hold all;
      C = abs(U(i,j)) + abs(V(i,j)); %Calculate the colors for all points in the plane
      set(grid, 'zdata', H(i,j), 'cdata', C);
      axis off;
+     frame = getframe;
+     writeVideo(aviobj,frame);       
      drawnow             
                   
     %If H is not a number
     if all(all(isnan(H))), break, end
     
  end
+ close(aviobj);
