@@ -1,6 +1,6 @@
 clc
 % For recording
-aviobj = VideoWriter('example.avi','Uncompressed AVI');
+aviobj = VideoWriter('example.avi');
 aviobj.FrameRate = 60;
 open(aviobj);
 tjohej= 0.1;
