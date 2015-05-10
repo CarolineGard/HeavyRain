@@ -72,10 +72,7 @@
                	gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
             } 
 
-            
-
         </script>
-
 
         <!--FRAGMENT-SHADERS-->
         <!-- Fragment shader for rain material -->
@@ -297,9 +294,9 @@
                         transparent:    true
                     }); 
 
-                //var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+                var materialet = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 
-                mesh = new THREE.Mesh( geometry, material );
+                mesh = new THREE.Mesh( geometry, materialet );
                 mesh.rotation.x = - Math.PI/2;
 
 
@@ -458,7 +455,7 @@
                           && Math.abs(particles.geometry.vertices[j].y - geometry.vertices[i].z) < 1.5 )
                         {
                             // Set the height of the water
-                            geometry.vertices[i].z = 3;
+                            geometry.vertices[i].z = -3;
 
                             // Reset the drop so that it falls from the sky again
                             particles.geometry.vertices[j].x = Math.round(Math.random() * 94 - 47);
@@ -512,13 +509,9 @@
 				//refractCamera.updateCubeMap( renderer, scene );
 				//mesh.visible = true;
 
-
-
-
                 //controls.update( clock.getDelta() );
                 renderer.render( scene, camera );
             }
-
         </script>
     </body>
 </html>
